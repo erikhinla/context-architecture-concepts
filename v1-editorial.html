@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Architecture — OCD Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --purple: #4B3792;
+            --green: #1B5E3C;
+            --teal: #5EC4AC;
+            --lavender: #E8E4F0;
+            --dark: #1A1A1A;
+            --white: #FFFFFF;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; color: var(--dark); line-height: 1.6; }
+
+        /* NAV */
+        nav { background: var(--dark); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--white); }
+        .logo span { color: var(--teal); }
+        .nav-cta { background: var(--teal); color: var(--dark); padding: 10px 24px; border-radius: 30px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; }
+        .nav-cta:hover { background: var(--white); }
+
+        /* HERO */
+        .hero { min-height: 100vh; background: var(--dark); display: flex; align-items: center; padding: 80px 60px; position: relative; overflow: hidden; }
+        .hero::before { content: ''; position: absolute; right: -200px; top: -200px; width: 800px; height: 800px; background: radial-gradient(circle, rgba(94,196,172,0.08) 0%, transparent 70%); }
+        .hero-content { max-width: 800px; z-index: 1; }
+        .hero-label { display: inline-block; padding: 8px 20px; border: 1px solid var(--teal); color: var(--teal); font-size: 12px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; border-radius: 30px; margin-bottom: 40px; }
+        .hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px, 10vw, 120px); line-height: 0.95; color: var(--white); margin-bottom: 30px; }
+        .hero h1 span { color: var(--teal); }
+        .hero p { font-size: 20px; color: rgba(255,255,255,0.7); max-width: 500px; margin-bottom: 40px; }
+        .btn-primary { display: inline-block; background: linear-gradient(135deg, var(--green), var(--teal)); color: var(--white); padding: 18px 40px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px; transition: all 0.3s; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(94,196,172,0.3); }
+        .btn-secondary { display: inline-block; border: 2px solid rgba(255,255,255,0.3); color: var(--white); padding: 16px 36px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 16px; margin-left: 16px; transition: all 0.2s; }
+        .btn-secondary:hover { border-color: var(--teal); color: var(--teal); }
+
+        /* COST SECTION */
+        .cost { background: var(--dark); padding: 120px 60px; text-align: center; position: relative; }
+        .cost-number { font-family: 'Bebas Neue', sans-serif; font-size: 200px; color: var(--teal); opacity: 0.15; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -60%); }
+        .cost h2 { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--white); margin-bottom: 24px; position: relative; }
+        .cost p { font-size: 18px; color: rgba(255,255,255,0.7); max-width: 600px; margin: 0 auto; position: relative; }
+
+        /* PROOF BAR */
+        .proof { background: var(--lavender); padding: 50px 60px; text-align: center; }
+        .proof-label { font-size: 11px; letter-spacing: 3px; color: #999; text-transform: uppercase; margin-bottom: 20px; }
+        .proof-logos { display: flex; justify-content: center; gap: 60px; align-items: center; flex-wrap: wrap; opacity: 0.5; }
+        .proof-logos span { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; color: #666; }
+
+        /* WHY NOW */
+        .why-now { padding: 120px 60px; background: var(--white); }
+        .why-now h2 { font-family: 'Bebas Neue', sans-serif; font-size: 64px; margin-bottom: 60px; }
+        .why-now h2 span { color: var(--teal); }
+        .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .why-card { padding: 40px; border-left: 3px solid var(--teal); }
+        .why-card h3 { font-size: 22px; margin-bottom: 12px; font-weight: 700; }
+        .why-card p { color: #555; font-size: 16px; }
+
+        /* TIERS */
+        .tiers { background: var(--purple); padding: 120px 60px; }
+        .tiers h2 { font-family: 'Bebas Neue', sans-serif; font-size: 64px; color: var(--white); text-align: center; margin-bottom: 60px; }
+        .tiers h2 span { color: var(--teal); }
+        .tier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 1000px; margin: 0 auto; }
+        .tier-card { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; padding: 40px 30px; text-align: center; transition: all 0.3s; }
+        .tier-card:hover { background: rgba(255,255,255,0.12); transform: translateY(-4px); }
+        .tier-card.featured { border-color: var(--teal); background: rgba(94,196,172,0.1); }
+        .tier-icon { font-size: 40px; margin-bottom: 16px; }
+        .tier-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--white); margin-bottom: 12px; }
+        .tier-card p { color: rgba(255,255,255,0.7); font-size: 15px; margin-bottom: 24px; }
+        .tier-card ul { list-style: none; text-align: left; margin-bottom: 30px; }
+        .tier-card li { color: rgba(255,255,255,0.8); font-size: 14px; padding: 6px 0; padding-left: 20px; position: relative; }
+        .tier-card li::before { content: '✓'; position: absolute; left: 0; color: var(--teal); font-weight: 700; }
+
+        /* DIAGNOSTIC */
+        .diagnostic { padding: 120px 60px; background: var(--white); }
+        .diagnostic h2 { font-family: 'Bebas Neue', sans-serif; font-size: 64px; margin-bottom: 16px; }
+        .diagnostic h2 span { color: var(--teal); }
+        .diagnostic .subtitle { color: #666; font-size: 18px; max-width: 600px; margin-bottom: 50px; }
+        .quiz-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 900px; }
+        .quiz-item { background: #f8f8f8; border-radius: 12px; padding: 28px; display: flex; align-items: flex-start; gap: 16px; transition: all 0.2s; cursor: pointer; border: 2px solid transparent; }
+        .quiz-item:hover { border-color: var(--teal); background: #f0faf7; }
+        .quiz-check { width: 24px; height: 24px; border: 2px solid #ccc; border-radius: 6px; flex-shrink: 0; margin-top: 2px; }
+        .quiz-item:hover .quiz-check { border-color: var(--teal); }
+        .quiz-item p { font-size: 15px; color: #444; }
+        .quiz-result { margin-top: 40px; padding: 30px; background: var(--dark); border-radius: 12px; color: var(--white); }
+        .quiz-result h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--teal); margin-bottom: 8px; }
+        .quiz-result p { color: rgba(255,255,255,0.7); font-size: 16px; }
+
+        /* PROCESS */
+        .process { padding: 120px 60px; background: var(--dark); }
+        .process h2 { font-family: 'Bebas Neue', sans-serif; font-size: 64px; color: var(--white); text-align: center; margin-bottom: 60px; }
+        .process h2 span { color: var(--teal); }
+        .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; max-width: 1000px; margin: 0 auto; }
+        .step { text-align: center; padding: 30px; position: relative; }
+        .step::after { content: '→'; position: absolute; right: -10px; top: 40px; color: var(--teal); font-size: 24px; }
+        .step:last-child::after { display: none; }
+        .step-num { font-family: 'Bebas Neue', sans-serif; font-size: 72px; color: var(--teal); opacity: 0.3; }
+        .step h3 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--white); margin-bottom: 8px; }
+        .step p { font-size: 14px; color: rgba(255,255,255,0.6); }
+
+        /* CTA */
+        .final-cta { padding: 120px 60px; background: linear-gradient(135deg, var(--purple), var(--dark)); text-align: center; }
+        .final-cta h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 7vw, 80px); color: var(--white); margin-bottom: 24px; }
+        .final-cta h2 span { color: var(--teal); }
+        .final-cta p { font-size: 18px; color: rgba(255,255,255,0.7); max-width: 500px; margin: 0 auto 40px; }
+
+        /* FOOTER */
+        footer { background: var(--dark); border-top: 1px solid rgba(255,255,255,0.1); padding: 40px 60px; text-align: center; }
+        footer p { color: rgba(255,255,255,0.4); font-size: 14px; }
+
+        @media (max-width: 768px) {
+            .hero { padding: 60px 24px; }
+            .cost, .why-now, .tiers, .diagnostic, .process, .final-cta { padding: 80px 24px; }
+            .steps { grid-template-columns: 1fr 1fr; }
+            .step::after { display: none; }
+            .btn-secondary { margin-left: 0; margin-top: 12px; display: inline-block; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">OCD EXPERIENCE — <span>CONTEXT ARCHITECTURE</span></div>
+    <a href="#book" class="nav-cta">Book Assessment</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-label">The Foundation for the AI Era</div>
+        <h1>YOUR CONTEXT IS<br>YOUR <span>ARCHITECTURE</span></h1>
+        <p>The systems, files, accounts, and digital infrastructure underneath your life either create momentum — or kill it. We build the foundation that makes everything else work.</p>
+        <a href="#book" class="btn-primary">Book Your Assessment →</a>
+        <a href="#diagnostic" class="btn-secondary">Take the Diagnostic</a>
+    </div>
+</section>
+
+<!-- COST -->
+<section class="cost">
+    <div class="cost-number">130</div>
+    <h2>THE HOURS YOU LOSE EACH YEAR<br>TO A BROKEN FOUNDATION</h2>
+    <p>The average professional spends 2.5 hours per week searching for files, resetting passwords, managing cluttered inboxes, and recovering from preventable friction. That's 130 hours a year. Three full work weeks. Gone.<br><br>This isn't a personal failure. It's a systems problem.<br>And systems problems have <strong style="color:var(--teal)">architecture solutions</strong>.</p>
+</section>
+
+<!-- PROOF -->
+<section class="proof">
+    <div class="proof-label">As Seen In</div>
+    <div class="proof-logos">
+        <span>ARCHITECTURAL DIGEST</span>
+        <span>ENTREPRENEUR</span>
+        <span>STYLEWATCH</span>
+        <span>KTLA</span>
+        <span>MAIL ONLINE</span>
+    </div>
+</section>
+
+<!-- WHY NOW -->
+<section class="why-now">
+    <h2>WHY <span>NOW</span></h2>
+    <div class="why-grid">
+        <div class="why-card">
+            <h3>AI Rewards Structure</h3>
+            <p>Every AI tool you adopt is only as good as the context it can access. A disorganized digital life means AI can't help you. An architected one makes AI a force multiplier.</p>
+        </div>
+        <div class="why-card">
+            <h3>Drift Compounds</h3>
+            <p>Every year without architecture adds friction, lost files, security exposure, and abandoned projects. The cost isn't linear — it compounds.</p>
+        </div>
+        <div class="why-card">
+            <h3>Infrastructure, Not Optional</h3>
+            <p>Context Architecture is like plumbing. You don't notice it when it works. But everything breaks when it doesn't. This is no longer a nice-to-have.</p>
+        </div>
+    </div>
+</section>
+
+<!-- TIERS -->
+<section class="tiers">
+    <h2>THREE LEVELS OF <span>TRANSFORMATION</span></h2>
+    <div class="tier-grid">
+        <div class="tier-card">
+            <div class="tier-icon">🔓</div>
+            <h3>FOUNDATION</h3>
+            <p>Get unblocked. Finish what you started.</p>
+            <ul>
+                <li>Full digital audit</li>
+                <li>File architecture & naming</li>
+                <li>Email inbox zero system</li>
+                <li>Password & security setup</li>
+                <li>Device sync configuration</li>
+            </ul>
+            <a href="#book" class="btn-primary" style="font-size:14px; padding:14px 28px;">Get Started →</a>
+        </div>
+        <div class="tier-card featured">
+            <div class="tier-icon">⚡</div>
+            <h3>MOMENTUM</h3>
+            <p>Reach your full potential. Systems that scale.</p>
+            <ul>
+                <li>Everything in Foundation</li>
+                <li>Workflow optimization</li>
+                <li>Project management setup</li>
+                <li>Cloud architecture</li>
+                <li>Automation foundations</li>
+                <li>90-day maintenance check</li>
+            </ul>
+            <a href="#book" class="btn-primary" style="font-size:14px; padding:14px 28px;">Get Started →</a>
+        </div>
+        <div class="tier-card">
+            <div class="tier-icon">🏗️</div>
+            <h3>ARCHITECTURE</h3>
+            <p>AI-ready infrastructure. Your competitive edge.</p>
+            <ul>
+                <li>Everything in Momentum</li>
+                <li>AI tool integration</li>
+                <li>Context mapping for AI agents</li>
+                <li>Team/family system design</li>
+                <li>Ongoing architecture partner</li>
+            </ul>
+            <a href="#book" class="btn-primary" style="font-size:14px; padding:14px 28px;">Get Started →</a>
+        </div>
+    </div>
+</section>
+
+<!-- DIAGNOSTIC -->
+<section class="diagnostic" id="diagnostic">
+    <h2>CONTEXT <span>DIAGNOSTIC</span></h2>
+    <p class="subtitle">How many of these sound familiar? Be honest — this is where momentum starts.</p>
+    <div class="quiz-grid">
+        <div class="quiz-item">
+            <div class="quiz-check"></div>
+            <p>I have files saved in 3+ different places and can't always find what I need</p>
+        </div>
+        <div class="quiz-item">
+            <div class="quiz-check"></div>
+            <p>My email inbox has more than 100 unread messages right now</p>
+        </div>
+        <div class="quiz-item">
+            <div class="quiz-check"></div>
+            <p>I've started projects I never finished because I lost track of where things were</p>
+        </div>
+        <div class="quiz-item">
+            <div class="quiz-check"></div>
+            <p>I use the same password for multiple accounts (or can't remember most of them)</p>
+        </div>
+        <div class="quiz-item">
+            <div class="quiz-check"></div>
+            <p>I know AI could help me but I don't know where to start or what to feed it</p>
+        </div>
+        <div class="quiz-item">
+            <div class="quiz-check"></div>
+            <p>I feel a low-grade anxiety that things are falling through the cracks</p>
+        </div>
+        <div class="quiz-item">
+            <div class="quiz-check"></div>
+            <p>I've bought apps, tools, or systems that I set up once and stopped using</p>
+        </div>
+        <div class="quiz-item">
+            <div class="quiz-check"></div>
+            <p>My phone, laptop, and cloud storage don't feel like one connected system</p>
+        </div>
+    </div>
+    <div class="quiz-result">
+        <h3>IF YOU CHECKED 3 OR MORE</h3>
+        <p>You don't have a discipline problem — you have an architecture problem. And that's exactly what we solve. The assessment takes 30 minutes and gives you a clear picture of where you stand and what it takes to build a foundation that lasts.</p>
+    </div>
+</section>
+
+<!-- PROCESS -->
+<section class="process">
+    <h2>HOW IT <span>WORKS</span></h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">01</div>
+            <h3>ASSESS</h3>
+            <p>We audit your entire digital state. Every device, account, and pain point.</p>
+        </div>
+        <div class="step">
+            <div class="step-num">02</div>
+            <h3>DESIGN</h3>
+            <p>We architect a system tailored to how you actually work and live.</p>
+        </div>
+        <div class="step">
+            <div class="step-num">03</div>
+            <h3>BUILD</h3>
+            <p>We install it with you or for you. Your choice. No disruption.</p>
+        </div>
+        <div class="step">
+            <div class="step-num">04</div>
+            <h3>OWN</h3>
+            <p>You own the system. Full documentation. No dependency on us.</p>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta" id="book">
+    <h2>BUILD THE <span>FOUNDATION</span>.<br>THEN BUILD ON IT.</h2>
+    <p>Your 30-minute assessment gives you a clear map of where you are, what's broken, and exactly what it takes to fix it. No pitch. Just architecture.</p>
+    <a href="#" class="btn-primary">Book Your Free Assessment →</a>
+</section>
+
+<footer>
+    <p>© 2026 OCD Experience. Organize & Create Discipline® — Context Architecture Division.</p>
+</footer>
+
+</body>
+</html>

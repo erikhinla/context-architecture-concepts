@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Architecture — OCD Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #111111;
+            --paper: #FAFAF8;
+            --sage: #4A7C6F;
+            --sage-light: #E8F0ED;
+            --muted: #777777;
+            --accent: #2D5A4E;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'DM Sans', sans-serif; color: var(--ink); background: var(--paper); }
+
+        .container { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+
+        /* NAV */
+        nav { padding: 24px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+        .logo { font-family: 'DM Serif Display', serif; font-size: 18px; }
+        .logo em { font-style: normal; color: var(--sage); }
+        nav a.cta { color: var(--sage); text-decoration: none; font-weight: 700; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* HERO */
+        .hero { padding: 160px 0 120px; text-align: center; }
+        .hero .overline { font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: var(--sage); margin-bottom: 32px; }
+        .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(40px, 6vw, 72px); line-height: 1.1; margin-bottom: 28px; }
+        .hero h1 em { font-style: italic; color: var(--sage); }
+        .hero p { font-size: 19px; color: var(--muted); max-width: 520px; margin: 0 auto 48px; line-height: 1.7; }
+        .hero-ctas { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn-fill { background: var(--ink); color: var(--paper); padding: 16px 36px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px; transition: all 0.2s; }
+        .btn-fill:hover { background: var(--sage); }
+        .btn-ghost { border: 2px solid var(--ink); color: var(--ink); padding: 14px 34px; border-radius: 50px; text-decoration: none; font-weight: 500; font-size: 15px; transition: all 0.2s; }
+        .btn-ghost:hover { border-color: var(--sage); color: var(--sage); }
+
+        /* DIVIDER */
+        .divider { text-align: center; padding: 60px 0; }
+        .divider span { display: inline-block; width: 40px; height: 1px; background: #ccc; }
+
+        /* MANIFESTO */
+        .manifesto { padding: 0 0 100px; }
+        .manifesto .container { max-width: 680px; }
+        .manifesto h2 { font-family: 'DM Serif Display', serif; font-size: 36px; margin-bottom: 32px; }
+        .manifesto p { font-size: 17px; color: #444; line-height: 1.8; margin-bottom: 20px; }
+        .manifesto strong { color: var(--ink); }
+        .manifesto em { color: var(--sage); font-style: normal; font-weight: 700; }
+
+        /* GRID SECTION */
+        .grid-section { padding: 100px 0; background: var(--ink); color: var(--paper); }
+        .grid-section h2 { font-family: 'DM Serif Display', serif; font-size: 42px; text-align: center; margin-bottom: 60px; }
+        .grid-section h2 em { color: var(--sage); font-style: italic; }
+        .benefit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 48px; max-width: 900px; margin: 0 auto; padding: 0 32px; }
+        .benefit { border-top: 1px solid rgba(255,255,255,0.15); padding-top: 24px; }
+        .benefit h3 { font-size: 20px; margin-bottom: 8px; font-weight: 700; }
+        .benefit p { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.6; }
+
+        /* DIAGNOSTIC */
+        .diagnostic { padding: 100px 0; }
+        .diagnostic h2 { font-family: 'DM Serif Display', serif; font-size: 42px; text-align: center; margin-bottom: 16px; }
+        .diagnostic .sub { text-align: center; color: var(--muted); font-size: 17px; margin-bottom: 50px; }
+        .q-list { max-width: 640px; margin: 0 auto; }
+        .q-item { padding: 20px 0; border-bottom: 1px solid #eee; font-size: 16px; color: #333; display: flex; gap: 16px; align-items: flex-start; cursor: pointer; transition: color 0.2s; }
+        .q-item:hover { color: var(--sage); }
+        .q-num { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--sage); opacity: 0.5; flex-shrink: 0; width: 30px; }
+        .q-cta { text-align: center; margin-top: 48px; }
+        .q-cta p { font-size: 15px; color: var(--muted); margin-bottom: 20px; }
+
+        /* TIERS */
+        .tiers { padding: 100px 0; background: var(--sage-light); }
+        .tiers h2 { font-family: 'DM Serif Display', serif; font-size: 42px; text-align: center; margin-bottom: 60px; }
+        .tier-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto; padding: 0 32px; }
+        .tier { background: white; border-radius: 16px; padding: 40px 32px; }
+        .tier.highlight { background: var(--ink); color: white; }
+        .tier-name { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--sage); margin-bottom: 12px; font-weight: 700; }
+        .tier.highlight .tier-name { color: var(--sage); }
+        .tier h3 { font-family: 'DM Serif Display', serif; font-size: 26px; margin-bottom: 16px; }
+        .tier p { font-size: 14px; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+        .tier.highlight p { color: rgba(255,255,255,0.6); }
+        .tier ul { list-style: none; }
+        .tier li { font-size: 14px; padding: 5px 0; color: #555; }
+        .tier.highlight li { color: rgba(255,255,255,0.7); }
+        .tier li::before { content: '— '; color: var(--sage); }
+
+        /* PROCESS */
+        .process { padding: 100px 0; }
+        .process h2 { font-family: 'DM Serif Display', serif; font-size: 42px; text-align: center; margin-bottom: 60px; }
+        .process-steps { display: flex; justify-content: center; gap: 60px; flex-wrap: wrap; max-width: 800px; margin: 0 auto; }
+        .p-step { text-align: center; flex: 1; min-width: 160px; }
+        .p-step .num { font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--sage); opacity: 0.3; margin-bottom: 8px; }
+        .p-step h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+        .p-step p { font-size: 14px; color: var(--muted); }
+
+        /* FINAL */
+        .final { padding: 140px 0; text-align: center; background: var(--ink); }
+        .final h2 { font-family: 'DM Serif Display', serif; font-size: clamp(36px, 5vw, 56px); color: var(--paper); margin-bottom: 20px; }
+        .final h2 em { color: var(--sage); font-style: italic; }
+        .final p { color: rgba(255,255,255,0.5); font-size: 17px; max-width: 480px; margin: 0 auto 40px; }
+
+        footer { padding: 32px; text-align: center; font-size: 13px; color: #aaa; }
+
+        @media (max-width: 600px) {
+            .hero { padding: 100px 0 80px; }
+            .process-steps { gap: 32px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">OCD Experience — <em>Context Architecture</em></div>
+    <a href="#book" class="cta">Book →</a>
+</nav>
+
+<section class="hero">
+    <div class="container">
+        <div class="overline">A New Discipline for the AI Era</div>
+        <h1>The foundation underneath<br>your life either <em>builds</em><br>or it <em>breaks</em>.</h1>
+        <p>Context Architecture is the practice of structuring your digital life so that every tool, file, and system creates clarity, momentum, and fulfillment — instead of draining them.</p>
+        <div class="hero-ctas">
+            <a href="#book" class="btn-fill">Book Your Assessment</a>
+            <a href="#diagnostic" class="btn-ghost">Take the Diagnostic</a>
+        </div>
+    </div>
+</section>
+
+<div class="divider"><span></span></div>
+
+<section class="manifesto">
+    <div class="container">
+        <h2>This isn't about being tidy.</h2>
+        <p>Most people think their problem is discipline. It's not. It's <em>architecture</em>.</p>
+        <p>You have files in five places. An inbox with 4,000 unread. Passwords you can't remember. Projects you started and lost track of. A phone that doesn't talk to your laptop. Tools you bought and never set up.</p>
+        <p>None of this is a character flaw. <strong>It's a missing foundation.</strong></p>
+        <p>And now — with AI tools, agents, and automation arriving faster than anyone expected — that foundation isn't just helpful. It's the difference between people who <em>leverage this moment</em> and people who get left behind.</p>
+        <p>Context Architecture is what we build for you. A permanent, scalable digital infrastructure designed around how you actually work and live. <strong>So you can stop managing chaos and start building on solid ground.</strong></p>
+    </div>
+</section>
+
+<section class="grid-section">
+    <div class="container">
+        <h2>What <em>changes</em></h2>
+        <div class="benefit-grid">
+            <div class="benefit">
+                <h3>Clarity</h3>
+                <p>Find any file in seconds. Know where everything is. The mental overhead of "where did I put that?" disappears.</p>
+            </div>
+            <div class="benefit">
+                <h3>Momentum</h3>
+                <p>Stop restarting. Finish the projects you've been circling. Build on what you've done instead of rebuilding from scratch.</p>
+            </div>
+            <div class="benefit">
+                <h3>Fulfillment</h3>
+                <p>That low-grade anxiety that things are falling through the cracks? It's not you. It's your system. We fix the system.</p>
+            </div>
+            <div class="benefit">
+                <h3>AI-Readiness</h3>
+                <p>Structured context makes every AI tool 10x more powerful. Your architecture becomes your competitive advantage.</p>
+            </div>
+            <div class="benefit">
+                <h3>Security</h3>
+                <p>Every account locked down. Passwords managed. 2FA everywhere. You stop being one breach away from disaster.</p>
+            </div>
+            <div class="benefit">
+                <h3>Freedom</h3>
+                <p>Same setup on every device. Everything synced. Work from anywhere without wondering if you have the right file.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="diagnostic" id="diagnostic">
+    <div class="container">
+        <h2>Context Diagnostic</h2>
+        <p class="sub">How many of these sound familiar?</p>
+        <div class="q-list">
+            <div class="q-item"><span class="q-num">1</span> I have important files scattered across 3+ locations and can't always find what I need.</div>
+            <div class="q-item"><span class="q-num">2</span> My email inbox has 100+ unread messages right now.</div>
+            <div class="q-item"><span class="q-num">3</span> I've started meaningful projects that stalled because I lost the thread.</div>
+            <div class="q-item"><span class="q-num">4</span> I reuse passwords or can't remember most of them.</div>
+            <div class="q-item"><span class="q-num">5</span> I know AI tools could help me but I don't know where to start.</div>
+            <div class="q-item"><span class="q-num">6</span> I feel a persistent, low-level anxiety that things are falling through cracks.</div>
+            <div class="q-item"><span class="q-num">7</span> I've bought productivity tools I set up once and stopped using.</div>
+            <div class="q-item"><span class="q-num">8</span> My devices don't feel like one unified system.</div>
+        </div>
+        <div class="q-cta">
+            <p>If 3+ resonate, you don't have a discipline problem. You have an architecture problem.</p>
+            <a href="#book" class="btn-fill">Let's Fix It →</a>
+        </div>
+    </div>
+</section>
+
+<section class="tiers">
+    <h2>Three Levels</h2>
+    <div class="tier-row">
+        <div class="tier">
+            <div class="tier-name">Foundation</div>
+            <h3>Get Unblocked</h3>
+            <p>For people drowning in digital chaos who need a clean foundation to build on.</p>
+            <ul>
+                <li>Full digital audit</li>
+                <li>File architecture & naming</li>
+                <li>Inbox zero infrastructure</li>
+                <li>Password & security setup</li>
+                <li>Device sync</li>
+            </ul>
+        </div>
+        <div class="tier highlight">
+            <div class="tier-name">Momentum</div>
+            <h3>Reach Full Potential</h3>
+            <p>For professionals ready to stop managing chaos and start building real momentum.</p>
+            <ul>
+                <li>Everything in Foundation</li>
+                <li>Workflow optimization</li>
+                <li>Project management setup</li>
+                <li>Cloud architecture</li>
+                <li>Automation foundations</li>
+                <li>90-day maintenance check</li>
+            </ul>
+        </div>
+        <div class="tier">
+            <div class="tier-name">Architecture</div>
+            <h3>Build Your Edge</h3>
+            <p>For founders and high-performers who want AI-ready infrastructure as a competitive advantage.</p>
+            <ul>
+                <li>Everything in Momentum</li>
+                <li>AI tool integration</li>
+                <li>Context mapping for AI agents</li>
+                <li>Team/family system design</li>
+                <li>Ongoing architecture partner</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="process">
+    <div class="container">
+        <h2>The Process</h2>
+        <div class="process-steps">
+            <div class="p-step">
+                <div class="num">1</div>
+                <h3>Assess</h3>
+                <p>30-minute audit of your digital state</p>
+            </div>
+            <div class="p-step">
+                <div class="num">2</div>
+                <h3>Design</h3>
+                <p>Custom architecture for how you work</p>
+            </div>
+            <div class="p-step">
+                <div class="num">3</div>
+                <h3>Build</h3>
+                <p>Done-for-you or done-with-you</p>
+            </div>
+            <div class="p-step">
+                <div class="num">4</div>
+                <h3>Own</h3>
+                <p>Full handoff. No dependency.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="final" id="book">
+    <h2>Build the <em>foundation</em>.<br>Then build on it.</h2>
+    <p>30 minutes. A clear map. No pitch — just architecture.</p>
+    <a href="#" class="btn-fill" style="background: var(--sage);">Book Your Free Assessment →</a>
+</section>
+
+<footer>
+    <p>© 2026 OCD Experience. Organize & Create Discipline® — Context Architecture Division.</p>
+</footer>
+
+</body>
+</html>
