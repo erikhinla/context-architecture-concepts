@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Architecture — OCD Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /*
+        ╔══════════════════════════════════════════════════════╗
+        ║  CONTEXT ARCHITECTURE — CLIENT-READY VERSION         ║
+        ║  For: Justin Klosky / OCD Experience                 ║
+        ║  Replaces: ocdexperience.com/digital-organizing/     ║
+        ║                                                      ║
+        ║  TO EDIT COPY: Search for [EDIT] in the HTML below.  ║
+        ║  Every editable text block is marked.                ║
+        ║                                                      ║
+        ║  FOR WIX DEVELOPER: See IMPLEMENTATION-NOTES.md      ║
+        ╚══════════════════════════════════════════════════════╝
+        */
+        
+        :root {
+            --bg-dark: #141414;
+            --bg-section: #1a1a1a;
+            --bg-card: #222222;
+            --text-white: #ffffff;
+            --text-light: rgba(255,255,255,0.85);
+            --text-muted: rgba(255,255,255,0.5);
+            --green: #1B5E3C;
+            --teal: #5EC4AC;
+            --purple: #4B3792;
+            --lavender: #E8E4F0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', 'Roboto', -apple-system, sans-serif; background: var(--bg-dark); color: var(--text-white); -webkit-font-smoothing: antialiased; }
+
+        /* SITE HEADER */
+        .site-header { 
+            background: var(--bg-dark); 
+            padding: 20px 48px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .site-header img { height: 32px; }
+        .site-nav { display: flex; gap: 32px; align-items: center; }
+        .site-nav a { 
+            font-family: 'Inter', sans-serif;
+            font-size: 13px; 
+            font-weight: 500; 
+            letter-spacing: 0.5px;
+            color: var(--text-muted); 
+            text-decoration: none; 
+            text-transform: uppercase;
+            transition: color 0.2s; 
+        }
+        .site-nav a:hover { color: var(--text-white); }
+        .site-nav a.active { color: var(--teal); }
+        .nav-cta { 
+            background: var(--teal) !important; 
+            color: var(--bg-dark) !important; 
+            padding: 10px 22px !important; 
+            border-radius: 4px !important;
+            font-weight: 600 !important;
+        }
+
+        /* BREADCRUMB */
+        .breadcrumb {
+            padding: 16px 48px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .breadcrumb a { color: var(--text-muted); text-decoration: none; }
+        .breadcrumb a:hover { color: var(--teal); }
+        .breadcrumb span { margin: 0 8px; }
+
+        /* HERO */
+        .hero {
+            padding: 80px 48px 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .hero-overline {
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .hero h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(36px, 4vw, 52px);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+        .hero h1 em { font-style: normal; color: var(--teal); }
+        .hero-body {
+            font-size: 17px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 32px;
+            font-weight: 400;
+        }
+        .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn {
+            display: inline-block;
+            padding: 14px 32px;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .btn-primary { background: var(--teal); color: var(--bg-dark); }
+        .btn-primary:hover { background: #4dd4b5; transform: translateY(-1px); }
+        .btn-outline { border: 1px solid rgba(255,255,255,0.2); color: var(--text-white); }
+        .btn-outline:hover { border-color: var(--teal); color: var(--teal); }
+
+        .hero-image {
+            background: var(--bg-card);
+            border-radius: 8px;
+            aspect-ratio: 4/3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .hero-image-placeholder {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+        .hero-image-placeholder .icon { font-size: 48px; margin-bottom: 12px; display: block; }
+
+        /* SERVICES ROW */
+        .services-row {
+            padding: 80px 48px;
+            background: var(--bg-section);
+            border-top: 1px solid rgba(255,255,255,0.04);
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .services-row .inner { max-width: 1200px; margin: 0 auto; }
+        .section-label {
+            font-size: 11px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--teal);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+        .section-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 48px;
+            letter-spacing: -0.3px;
+        }
+        .section-title em { font-style: normal; color: var(--teal); }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .service-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 8px;
+            padding: 32px 24px;
+            transition: all 0.2s;
+        }
+        .service-card:hover { border-color: rgba(94,196,172,0.3); transform: translateY(-2px); }
+        .service-icon { font-size: 28px; margin-bottom: 16px; }
+        .service-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+        .service-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        /* STAT SECTION */
+        .stat-section {
+            padding: 100px 48px;
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .stat-big {
+            font-size: 96px;
+            font-weight: 800;
+            color: var(--teal);
+            opacity: 0.2;
+            line-height: 1;
+            margin-bottom: -12px;
+        }
+        .stat-section h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+        .stat-section p {
+            font-size: 16px;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        /* TIERS */
+        .tiers-section {
+            padding: 80px 48px;
+            background: var(--bg-section);
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .tiers-section .inner { max-width: 1200px; margin: 0 auto; }
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .tier-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 8px;
+            padding: 36px 28px;
+            transition: all 0.2s;
+        }
+        .tier-card.featured { border-color: var(--teal); }
+        .tier-badge {
+            display: inline-block;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--teal);
+            border: 1px solid rgba(94,196,172,0.3);
+            padding: 4px 10px;
+            border-radius: 3px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        .tier-card h3 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+        .tier-card .tier-desc { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+        .tier-card ul { list-style: none; margin-bottom: 24px; }
+        .tier-card li { font-size: 14px; color: var(--text-light); padding: 6px 0; padding-left: 20px; position: relative; }
+        .tier-card li::before { content: '✓'; position: absolute; left: 0; color: var(--teal); font-weight: 600; font-size: 13px; }
+
+        /* DIAGNOSTIC QUIZ */
+        .quiz-section {
+            padding: 80px 48px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .quiz-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 18px 20px;
+            background: var(--bg-card);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 6px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quiz-item:hover { border-color: rgba(94,196,172,0.3); }
+        .quiz-check {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.15);
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .quiz-item.checked .quiz-check { background: var(--teal); border-color: var(--teal); }
+        .quiz-item.checked .quiz-check::after { content: '✓'; color: var(--bg-dark); font-size: 12px; font-weight: 700; }
+        .quiz-item p { font-size: 15px; color: var(--text-light); }
+        .quiz-result {
+            margin-top: 24px;
+            padding: 28px;
+            background: var(--bg-card);
+            border: 1px solid var(--teal);
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        .quiz-result.show { display: block; }
+        .quiz-result h3 { color: var(--teal); font-size: 18px; margin-bottom: 8px; }
+        .quiz-result p { color: var(--text-muted); font-size: 15px; margin-bottom: 20px; }
+
+        /* PROCESS */
+        .process-section {
+            padding: 80px 48px;
+            background: var(--bg-section);
+            border-top: 1px solid rgba(255,255,255,0.04);
+        }
+        .process-section .inner { max-width: 1200px; margin: 0 auto; }
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+        .process-step { text-align: center; padding: 24px; }
+        .process-num {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--teal);
+            opacity: 0.2;
+            margin-bottom: 8px;
+        }
+        .process-step h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
+        .process-step p { font-size: 14px; color: var(--text-muted); }
+
+        /* BOOKING CTA */
+        .booking-section {
+            padding: 100px 48px;
+            text-align: center;
+        }
+        .booking-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(94,196,172,0.2);
+            border-radius: 8px;
+            padding: 56px 48px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+        .booking-card h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .booking-card h2 em { font-style: normal; color: var(--teal); }
+        .booking-rate {
+            font-size: 56px;
+            font-weight: 800;
+            color: var(--teal);
+            margin: 20px 0 4px;
+        }
+        .booking-rate span { font-size: 22px; opacity: 0.5; font-weight: 500; }
+        .booking-detail {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        .booking-body {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 32px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* SITE FOOTER */
+        .site-footer {
+            background: var(--bg-section);
+            border-top: 1px solid rgba(255,255,255,0.04);
+            padding: 60px 48px 40px;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 48px;
+        }
+        .footer-col h4 {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        .footer-col a {
+            display: block;
+            font-size: 14px;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 4px 0;
+            transition: color 0.2s;
+        }
+        .footer-col a:hover { color: var(--teal); }
+        .footer-col p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 32px auto 0;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-bottom p { font-size: 12px; color: rgba(255,255,255,0.3); }
+        .footer-bottom img { height: 20px; opacity: 0.4; }
+
+        @media (max-width: 900px) {
+            .hero { grid-template-columns: 1fr; padding: 48px 24px; }
+            .service-grid, .tier-grid, .process-grid { grid-template-columns: 1fr 1fr; }
+            .site-header { padding: 16px 24px; }
+            .site-nav a:not(.nav-cta) { display: none; }
+            .footer-inner { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            .service-grid, .tier-grid, .process-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============ SITE HEADER ============ -->
+<header class="site-header">
+    <img src="https://ocdexperience.com/wp-content/uploads/2025/05/OCD-Experience-logo-White.webp" alt="OCD Experience">
+    <nav class="site-nav">
+        <!-- [EDIT] Navigation labels -->
+        <a href="#">Physical O.C.D.</a>
+        <a href="#" class="active">Context Architecture</a>
+        <a href="#">Moving O.C.D.</a>
+        <a href="#">Wallets</a>
+        <a href="#">About</a>
+        <a href="#book" class="nav-cta">Book Consultation</a>
+    </nav>
+</header>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+    <a href="https://ocdexperience.com">Home</a> <span>›</span>
+    <a href="#">Services</a> <span>›</span>
+    Context Architecture
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+    <div>
+        <!-- [EDIT] Hero overline -->
+        <div class="hero-overline">The Foundation for the AI Era</div>
+
+        <!-- [EDIT] Hero headline — text inside <em> tags appears in teal -->
+        <h1>Your Digital Life Has a Foundation Problem. <em>We Fix It.</em></h1>
+
+        <!-- [EDIT] Hero body copy -->
+        <p class="hero-body">Context Architecture is the practice of structuring your digital life so that every tool, file, and system creates clarity, momentum, and fulfillment — instead of draining them.</p>
+
+        <div class="hero-ctas">
+            <!-- [EDIT] Button text and price -->
+            <a href="#book" class="btn btn-primary">Book Consultation — $170</a>
+            <a href="#diagnostic" class="btn btn-outline">Take the Diagnostic</a>
+        </div>
+    </div>
+    <div class="hero-image">
+        <!-- [EDIT] Replace this placeholder with actual hero image -->
+        <!-- Developer: Replace with <img src="your-image.jpg" style="width:100%;height:100%;object-fit:cover;"> -->
+        <div class="hero-image-placeholder">
+            <span class="icon">🖥️</span>
+            Hero image: split-screen before/after<br>
+            <small style="opacity:0.4">Cluttered desktop → architected workspace</small>
+        </div>
+    </div>
+</section>
+
+<!-- ============ WHAT WE BUILD — 4 SERVICE CARDS ============ -->
+<section class="services-row">
+    <div class="inner">
+        <!-- [EDIT] Section label and title -->
+        <div class="section-label">What We Build</div>
+        <div class="section-title">Context <em>Architecture</em></div>
+
+        <div class="service-grid">
+            <!-- [EDIT] Card 1 -->
+            <div class="service-card">
+                <div class="service-icon">📁</div>
+                <h3>File Architecture</h3>
+                <p>A naming and folder system designed for how you actually work. Find anything in seconds.</p>
+            </div>
+
+            <!-- [EDIT] Card 2 -->
+            <div class="service-card">
+                <div class="service-icon">📧</div>
+                <h3>Email Infrastructure</h3>
+                <p>Inbox zero by design — filters, folders, and flow that maintain themselves.</p>
+            </div>
+
+            <!-- [EDIT] Card 3 -->
+            <div class="service-card">
+                <div class="service-icon">🔒</div>
+                <h3>Security Structure</h3>
+                <p>Passwords, 2FA, and every account locked down and documented.</p>
+            </div>
+
+            <!-- [EDIT] Card 4 -->
+            <div class="service-card">
+                <div class="service-icon">☁️</div>
+                <h3>Device Sync</h3>
+                <p>Everything accessible from everywhere. One seamless system across all devices.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ STAT / PAIN POINT ============ -->
+<section class="stat-section">
+    <!-- [EDIT] Stat number -->
+    <div class="stat-big">130</div>
+
+    <!-- [EDIT] Stat headline -->
+    <h2>Hours lost every year to digital friction</h2>
+
+    <!-- [EDIT] Stat body copy -->
+    <p>2.5 hours/week searching for files, resetting passwords, managing cluttered inboxes. That's three full work weeks gone annually. It's not a discipline problem — it's a systems problem. And systems problems have architecture solutions.</p>
+</section>
+
+<!-- ============ THREE TIERS ============ -->
+<section class="tiers-section">
+    <div class="inner">
+        <!-- [EDIT] Section label and title -->
+        <div class="section-label">Three Levels of Transformation</div>
+        <div class="section-title">Choose Your <em>Architecture</em></div>
+
+        <div class="tier-grid">
+            <!-- [EDIT] TIER 1: Foundation -->
+            <div class="tier-card">
+                <div class="tier-badge">Foundation</div>
+                <h3>Get Unblocked</h3>
+                <p class="tier-desc">For people drowning in digital chaos who need a clean foundation to build on.</p>
+                <ul>
+                    <li>Full digital audit</li>
+                    <li>File architecture & naming</li>
+                    <li>Inbox zero infrastructure</li>
+                    <li>Password & security setup</li>
+                    <li>Device sync configuration</li>
+                </ul>
+                <a href="#book" class="btn btn-outline" style="width:100%; text-align:center;">Get Started</a>
+            </div>
+
+            <!-- [EDIT] TIER 2: Momentum (featured/highlighted) -->
+            <div class="tier-card featured">
+                <div class="tier-badge">Momentum</div>
+                <h3>Reach Full Potential</h3>
+                <p class="tier-desc">For professionals ready to stop managing chaos and start building real momentum.</p>
+                <ul>
+                    <li>Everything in Foundation</li>
+                    <li>Workflow optimization</li>
+                    <li>Project management setup</li>
+                    <li>Cloud architecture</li>
+                    <li>Automation foundations</li>
+                    <li>90-day maintenance check</li>
+                </ul>
+                <a href="#book" class="btn btn-primary" style="width:100%; text-align:center;">Get Started</a>
+            </div>
+
+            <!-- [EDIT] TIER 3: Architecture -->
+            <div class="tier-card">
+                <div class="tier-badge">Architecture</div>
+                <h3>Build Your Edge</h3>
+                <p class="tier-desc">For founders who want AI-ready infrastructure as a competitive advantage.</p>
+                <ul>
+                    <li>Everything in Momentum</li>
+                    <li>AI tool integration</li>
+                    <li>Context mapping for AI agents</li>
+                    <li>Team/family system design</li>
+                    <li>Ongoing architecture partner</li>
+                </ul>
+                <a href="#book" class="btn btn-outline" style="width:100%; text-align:center;">Get Started</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ CONTEXT DIAGNOSTIC (Interactive Quiz) ============ -->
+<section class="quiz-section" id="diagnostic">
+    <!-- [EDIT] Section label and title -->
+    <div class="section-label">Context Diagnostic</div>
+    <div class="section-title">How solid is your <em>foundation</em>?</div>
+    <p style="color:var(--text-muted); margin-bottom: 32px;">Check the ones that sound familiar.</p>
+
+    <!-- [EDIT] Quiz items — change text inside <p> tags -->
+    <div class="quiz-item" onclick="this.classList.toggle('checked'); updateQuiz()">
+        <div class="quiz-check"></div>
+        <p>I have important files scattered across 3+ locations</p>
+    </div>
+    <div class="quiz-item" onclick="this.classList.toggle('checked'); updateQuiz()">
+        <div class="quiz-check"></div>
+        <p>My email inbox has 100+ unread messages right now</p>
+    </div>
+    <div class="quiz-item" onclick="this.classList.toggle('checked'); updateQuiz()">
+        <div class="quiz-check"></div>
+        <p>I've started projects I never finished because I lost the thread</p>
+    </div>
+    <div class="quiz-item" onclick="this.classList.toggle('checked'); updateQuiz()">
+        <div class="quiz-check"></div>
+        <p>I reuse passwords or can't remember most of them</p>
+    </div>
+    <div class="quiz-item" onclick="this.classList.toggle('checked'); updateQuiz()">
+        <div class="quiz-check"></div>
+        <p>I know AI could help me but don't know where to start</p>
+    </div>
+    <div class="quiz-item" onclick="this.classList.toggle('checked'); updateQuiz()">
+        <div class="quiz-check"></div>
+        <p>I feel persistent anxiety that things are falling through the cracks</p>
+    </div>
+    <div class="quiz-item" onclick="this.classList.toggle('checked'); updateQuiz()">
+        <div class="quiz-check"></div>
+        <p>I've bought productivity tools I set up once and abandoned</p>
+    </div>
+    <div class="quiz-item" onclick="this.classList.toggle('checked'); updateQuiz()">
+        <div class="quiz-check"></div>
+        <p>My devices don't feel like one unified system</p>
+    </div>
+
+    <!-- [EDIT] Quiz result text -->
+    <div class="quiz-result" id="quizResult">
+        <h3>You don't have a discipline problem.</h3>
+        <p>You have an architecture problem. The good news? Architecture problems have architecture solutions.</p>
+        <a href="#book" class="btn btn-primary">Book Consultation — $170</a>
+    </div>
+</section>
+
+<script>
+function updateQuiz() {
+    var n = document.querySelectorAll('.quiz-item.checked').length;
+    document.getElementById('quizResult').classList.toggle('show', n >= 3);
+}
+</script>
+
+<!-- ============ PROCESS — 4 STEPS ============ -->
+<section class="process-section">
+    <div class="inner">
+        <!-- [EDIT] Section label and title -->
+        <div class="section-label">How It Works</div>
+        <div class="section-title">The <em>Process</em></div>
+
+        <div class="process-grid">
+            <!-- [EDIT] Step 1 -->
+            <div class="process-step">
+                <div class="process-num">01</div>
+                <h3>Assess</h3>
+                <p>2-hour hands-on audit of your entire digital state</p>
+            </div>
+
+            <!-- [EDIT] Step 2 -->
+            <div class="process-step">
+                <div class="process-num">02</div>
+                <h3>Design</h3>
+                <p>Custom architecture built around how you actually work</p>
+            </div>
+
+            <!-- [EDIT] Step 3 -->
+            <div class="process-step">
+                <div class="process-num">03</div>
+                <h3>Build</h3>
+                <p>Done-for-you or done-with-you — no disruption</p>
+            </div>
+
+            <!-- [EDIT] Step 4 -->
+            <div class="process-step">
+                <div class="process-num">04</div>
+                <h3>Own</h3>
+                <p>Full handoff. Your infrastructure. Zero dependency.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ BOOKING / PRICING — All CTAs route here ============ -->
+<section class="booking-section" id="book">
+    <div class="booking-card">
+        <!-- [EDIT] Booking headline -->
+        <h2>Initial <em>Consultation</em></h2>
+
+        <!-- [EDIT] Rate and session details -->
+        <div class="booking-rate">$85<span>/hr</span></div>
+        <div class="booking-detail">First session: 2 hours ($170) — tailored to your needs</div>
+
+        <!-- [EDIT] Booking body copy -->
+        <p class="booking-body">This isn't a discovery call. It's a working session. Justin audits your entire digital state, identifies friction points and security gaps, and builds a custom architecture roadmap you can act on immediately.</p>
+
+        <!-- [EDIT] Button text. Developer: Link to booking/scheduling tool -->
+        <a href="#" class="btn btn-primary" style="padding:16px 44px; font-size:16px;">Book Your Consultation →</a>
+    </div>
+</section>
+
+<!-- ============ SITE FOOTER ============ -->
+<footer class="site-footer">
+    <div class="footer-inner">
+        <div class="footer-col">
+            <!-- [EDIT] Footer links -->
+            <h4>Services</h4>
+            <a href="#">Physical O.C.D.</a>
+            <a href="#" style="color:var(--teal);">Context Architecture</a>
+            <a href="#">Moving O.C.D.</a>
+            <a href="#">O.C.D. Wallets</a>
+        </div>
+        <div class="footer-col">
+            <h4>Company</h4>
+            <a href="#">About Justin</a>
+            <a href="#">Press</a>
+            <a href="#">Contact</a>
+        </div>
+        <div class="footer-col">
+            <!-- [EDIT] Footer description -->
+            <h4>Context Architecture</h4>
+            <p>The foundation for the AI era. Structuring digital lives for clarity, momentum, and fulfillment.</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2026 OCD Experience. Organize & Create Discipline®</p>
+        <img src="https://ocdexperience.com/wp-content/uploads/2025/05/OCD-Experience-logo-White.webp" alt="OCD Experience">
+    </div>
+</footer>
+
+</body>
+</html>
